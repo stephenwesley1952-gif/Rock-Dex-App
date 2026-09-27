@@ -1,2 +1,10 @@
 # Rock-Dex-App
-The app and license identifies and classifies rocks from pictures you upload to the app it tells you to make up where it came from the hardness or the crack it open slab it leave it as it is or throw it back in the creek and helps you make decisions on I have to cut the rugby juice to do so and creates a catalog to store your finds .
+
+**Rock-Dex-App** helps rockhounds identify, classify, and organize their rock collections using photo recognition.
+
+## Features
+
+* **Instant Identification:** Upload photos to identify rock type, mineral composition, and estimate hardness.
+* **Lapidary Guidance:** Get recommendations on whether to crack it open, slab it, polish it, or leave it natural.
+* **Tool & Cutting Advice:** Receive practical tips on how to prepare and cut rough material safely and effectively.
+* **Personal Digital Catalog:** Store, log, and organize details about where and when you found each specimen.
