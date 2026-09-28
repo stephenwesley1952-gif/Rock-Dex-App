@@ -1,0 +1,34 @@
+import streamlit as st
+
+st.set_page_config(page_title="Rock-Dex App", page_icon="🪨")
+
+st.title("🪨 Rock-Dex Catalog & Evaluation App")
+st.write("Welcome to your field sorting and cataloging assistant.")
+
+# Specimen Details Input
+st.header("1. Specimen Details")
+rock_name = st.text_input("Specimen Name / Identification:", "Fossiliferous Chert")
+
+matrix_state = st.selectbox(
+    "Matrix State / Condition:",
+    ["Solid / Dense / Silicified", "Porous / Leached / Vuggy", "Fractured / Chalky"]
+)
+
+has_coating = st.checkbox("Has surface coating/rind? (e.g., Manganese or Bitumen)")
+
+# Recommendation Engine
+st.header("2. Action Recommendation")
+
+if st.button("Evaluate Specimen"):
+    if matrix_state == "Solid / Dense / Silicified":
+        st.success("✅ **Recommendation: Slab & Polish**")
+        st.write("This specimen has a high-density, solid matrix suitable for wet table saw slabbing and lapidary polishing.")
+    elif matrix_state == "Porous / Leached / Vuggy":
+        st.warning("⚠️ **Recommendation: Display As-Is or Split along Stress Lines**")
+        st.write("The matrix is leached or porous. Slabbing may crumble the stone; keep as a textured display piece or split carefully with a chisel.")
+    else:
+        st.error("🚫 **Recommendation: Creek Return / Discard**")
+        st.write("Excessive fracturing or chalkiness makes this unsuitable for lapidary work.")
+
+    if has_coating:
+        st.info("💡 **Coating Test Tip:** Drop hydrogen peroxide on the black rind. Vigorous fizzing confirms a manganese oxide skin (*wad*).")
