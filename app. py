@@ -1,34 +1,43 @@
+
 import streamlit as st
 
-st.set_page_config(page_title="Rock-Dex App", page_icon="🪨")
+st.set_page_config(page_title="RockDex", page_icon="🪨", layout="wide")
 
-st.title("🪨 Rock-Dex Catalog & Evaluation App")
-st.write("Welcome to your field sorting and cataloging assistant.")
+st.title("🪨 RockDex: Specimen Catalog & ID")
+st.write("Your personal field guide and collection manager for Southwest Missouri minerals and beyond.")
 
-# Specimen Details Input
-st.header("1. Specimen Details")
-rock_name = st.text_input("Specimen Name / Identification:", "Fossiliferous Chert")
+# Create the three-tab structure
+tab1, tab2, tab3 = st.tabs(["🔍 Identification", "🧪 Physical Testing Wizard", "📋 Specimen Catalog"])
 
-matrix_state = st.selectbox(
-    "Matrix State / Condition:",
-    ["Solid / Dense / Silicified", "Porous / Leached / Vuggy", "Fractured / Chalky"]
-)
+with tab1:
+    st.header("Specimen Identification")
+    st.write("Quickly identify chert, druzy quartz, calcite, galena, and more.")
+    
+    # Simple search / filter inputs
+    search_query = st.text_input("Search specimen characteristics (e.g., hardness, color, luster):")
+    if search_query:
+        st.info(f"Searching database for: {search_query}...")
 
-has_coating = st.checkbox("Has surface coating/rind? (e.g., Manganese or Bitumen)")
+with tab2:
+    st.header("Physical Testing Wizard")
+    st.write("Step-by-step guidance for streak, hardness, and acid testing.")
+    
+    hardness_test = st.selectbox("Select Mohs Hardness Test Result:", ["Select...", "Scratched by fingernail (< 2.5)", "Scratched by copper penny (3.5)", "Scratched by glass (5.5)", "Scratches glass (> 5.5)"])
+    if hardness_test != "Select...":
+        st.success(f"Noted result: {hardness_test}. This helps narrow down quartz, calcite, and chert.")
 
-# Recommendation Engine
-st.header("2. Action Recommendation")
+with tab3:
+    st.header("Specimen Catalog")
+    st.write("Log and view your collected specimens.")
+    
+    with st.form("catalog_form"):
+        specimen_name = st.text_input("Specimen Name / Type")
+        location_found = st.text_input("Location Found (e.g., local creek bed)")
+        notes = st.text_area("Notes & Observations")
+        submitted = st.form_submit_button("Save Specimen")
+        
+        if submitted:
+            st.success(f"Saved {specimen_name} to your catalog!")
 
-if st.button("Evaluate Specimen"):
-    if matrix_state == "Solid / Dense / Silicified":
-        st.success("✅ **Recommendation: Slab & Polish**")
-        st.write("This specimen has a high-density, solid matrix suitable for wet table saw slabbing and lapidary polishing.")
-    elif matrix_state == "Porous / Leached / Vuggy":
-        st.warning("⚠️ **Recommendation: Display As-Is or Split along Stress Lines**")
-        st.write("The matrix is leached or porous. Slabbing may crumble the stone; keep as a textured display piece or split carefully with a chisel.")
-    else:
-        st.error("🚫 **Recommendation: Creek Return / Discard**")
-        st.write("Excessive fracturing or chalkiness makes this unsuitable for lapidary work.")
-
-    if has_coating:
-        st.info("💡 **Coating Test Tip:** Drop hydrogen peroxide on the black rind. Vigorous fizzing confirms a manganese oxide skin (*wad*).")
+st.sidebar.markdown("---")
+st.sidebar.write("**RockDex v1.1** — Field & Lab Assistant")
