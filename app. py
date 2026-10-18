@@ -40,4 +40,4 @@ with tab3:
             st.success(f"Saved {specimen_name} to your catalog!")
 
 st.sidebar.markdown("---")
-st.sidebar.write("**RockDex v1.1** — Field & Lab Assistant")
+st.sidebar.write("**RockDex v1.1** — Field & Lab Assistant") 
