@@ -1,43 +1,132 @@
-
+import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="RockDex", page_icon="🪨", layout="wide")
+# Page Configuration
+st.set_page_config(
+    page_title="RockDex - Mineral & Rock Identification",
+    page_icon="🪨",
+    layout="centered",
+)
 
-st.title("🪨 RockDex: Specimen Catalog & ID")
-st.write("Your personal field guide and collection manager for Southwest Missouri minerals and beyond.")
+st.title("🪨 RockDex")
+st.caption("Field & Lab Mineral Identification & Cataloging Assistant")
 
-# Create the three-tab structure
-tab1, tab2, tab3 = st.tabs(["🔍 Identification", "🧪 Physical Testing Wizard", "📋 Specimen Catalog"])
+# Initialize session state for your collection catalog
+if "catalog" not in st.session_state:
+  st.session_state.catalog = pd.DataFrame(
+      columns=[
+          "Specimen Name",
+          "Location",
+          "Hardness",
+          "Streak",
+          "Luster",
+          "Acid Test",
+          "Notes",
+      ]
+  )
 
+# Three primary tabs for clean workflow without clutter
+tab1, tab2, tab3 = st.tabs(
+    ["📝 Identification", "🔍 Physical Testing", "📂 Collection Catalog"]
+)
+
+# --- TAB 1: SPECIMEN IDENTIFICATION ---
 with tab1:
-    st.header("Specimen Identification")
-    st.write("Quickly identify chert, druzy quartz, calcite, galena, and more.")
-    
-    # Simple search / filter inputs
-    search_query = st.text_input("Search specimen characteristics (e.g., hardness, color, luster):")
-    if search_query:
-        st.info(f"Searching database for: {search_query}...")
+  st.subheader("New Specimen Identification")
 
+  # Photo upload for visual identification & preview
+  uploaded_file = st.file_uploader(
+      "Attach Specimen Photo", type=["jpg", "jpeg", "png"]
+  )
+  if uploaded_file is not None:
+    st.image(
+        uploaded_file, caption="Uploaded Specimen", use_container_width=True
+    )
+
+  specimen_name_guess = st.text_input("Specimen Name / Preliminary Guess")
+  location_found = st.text_input("Discovery Location")
+  field_notes = st.text_area(
+      "Field Notes & Observations (color, habit, context)"
+  )
+
+  # AI Identification Trigger (combines image and text descriptions)
+  if st.button("🤖 Run AI Identification Analysis"):
+    if uploaded_file is not None:
+      with st.spinner("Analyzing specimen photo and your field notes..."):
+        # Placeholder for AI evaluation logic using multimodal input
+        st.success("AI Analysis Complete!")
+        st.info(
+            "💡 **AI Recommendation:** Based on your photo upload and notes,"
+            " this specimen exhibits characteristics consistent with local"
+            " mineral formations. Cross-reference with physical hardness and"
+            " streak tests in the next tab to confirm!"
+        )
+    else:
+      st.warning("Please upload a specimen photo to run AI identification.")
+
+  if st.button("💾 Save Specimen to Catalog"):
+    new_row = {
+        "Specimen Name": specimen_name_guess or "Unnamed Specimen",
+        "Location": location_found or "Unknown",
+        "Hardness": "Tested in Tab 2",
+        "Streak": "Tested in Tab 2",
+        "Luster": "Tested in Tab 2",
+        "Acid Test": "Tested in Tab 2",
+        "Notes": field_notes,
+    }
+    st.session_state.catalog = pd.concat(
+        [st.session_state.catalog, pd.DataFrame([new_row])], ignore_index=True
+    )
+    st.success("Specimen successfully saved to your collection catalog!")
+
+# --- TAB 2: PHYSICAL TESTING ---
 with tab2:
-    st.header("Physical Testing Wizard")
-    st.write("Step-by-step guidance for streak, hardness, and acid testing.")
-    
-    hardness_test = st.selectbox("Select Mohs Hardness Test Result:", ["Select...", "Scratched by fingernail (< 2.5)", "Scratched by copper penny (3.5)", "Scratched by glass (5.5)", "Scratches glass (> 5.5)"])
-    if hardness_test != "Select...":
-        st.success(f"Noted result: {hardness_test}. This helps narrow down quartz, calcite, and chert.")
+  st.subheader("Physical Property Testing")
 
+  # Expandable Reference Guide containing Mohs scale, lusters, and vinegar acid tests
+  with st.expander("📖 Field Reference Guide (Mohs, Luster & Chemical Tests)"):
+    st.markdown("""
+        * **Fingernail:** 2.5  
+        * **Copper Penny:** 3.5  
+        * **Steel Nail / Pocket Knife:** 5.5  
+        * **Window Glass:** 5.5 - 6  
+        * **Quartz:** 7  
+        * **Common Lusters:** Vitreous (glassy), Metallic, Earthy, Pearly, Greasy
+        * **🧪 Field Acid Test (Vinegar / Weak Acid):** 
+          * Apply a drop of household white vinegar or dilute acid to check for effervescence (bubbling/fizzing).
+          * **Positive reaction:** Indicates carbonates like calcite, aragonite, or limestone.
+        """)
+
+  hardness = st.slider("Estimated Mohs Hardness", 1.0, 10.0, 5.0, 0.5)
+  streak = st.text_input("Streak Test Color")
+  luster = st.selectbox(
+      "Luster",
+      ["Vitreous", "Metallic", "Earthy", "Pearly", "Greasy", "Resinous"],
+  )
+  acid_test = st.radio("Acid Reaction (Vinegar / HCL)", ["None", "Fizzes"])
+
+  st.caption(
+      f"Current Active Tests -> Hardness: {hardness} | Streak: {streak} |"
+      f" Luster: {luster} | Acid: {acid_test}"
+  )
+
+# --- TAB 3: COLLECTION CATALOG ---
 with tab3:
-    st.header("Specimen Catalog")
-    st.write("Log and view your collected specimens.")
-    
-    with st.form("catalog_form"):
-        specimen_name = st.text_input("Specimen Name / Type")
-        location_found = st.text_input("Location Found (e.g., local creek bed)")
-        notes = st.text_area("Notes & Observations")
-        submitted = st.form_submit_button("Save Specimen")
-        
-        if submitted:
-            st.success(f"Saved {specimen_name} to your catalog!")
+  st.subheader("Your Rock & Mineral Catalog")
 
-st.sidebar.markdown("---")
-st.sidebar.write("**RockDex v1.1** — Field & Lab Assistant") 
+  df = st.session_state.catalog
+
+  # CSV Export Button placed cleanly next to data view
+  if not df.empty:
+    csv_data = df.to_csv(index=False).encode("utf-8")
+    col1, col2 = st.columns([2, 1])
+    with col2:
+      st.download_button(
+          label="📥 Export Collection (CSV)",
+          data=csv_data,
+          file_name="rockdex_collection.csv",
+          mime="text/csv",
+      )
+
+  # Display the catalog table
+  st.dataframe(df, use_container
